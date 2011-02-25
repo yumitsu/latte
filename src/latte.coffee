@@ -71,8 +71,9 @@ latte =
     (letb (slen = (len seq)) ->
         (all seq, ((prev, idx) ->
             (yn (idx + 1 >= slen), (-> true)
-                                 , (-> fn prev, (nth idx, seq)))))))
+                                 , (-> fn prev, (car (nth idx + 1, seq))))))))
 
+# Compares if all items on the list are loosely equal `l == r`
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
 
