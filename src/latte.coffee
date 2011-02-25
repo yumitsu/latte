@@ -140,55 +140,13 @@ latte =
 
 
 # --[ CONSTANTS ]--------------------------------------------------------------
+###############################################################################
+# Used to indicate a given iteration should be stopped.                       #
+###############################################################################
 (set $break: {})
 
 
-# --[ CONDITIONALS ]-----------------------------------------------------------
-# Makes a truth tests, calls pass if it passes, fail otherwise
-(defun yn: (test, pass, fail) ->
-    (if test then pass?() else fail?()))
-
-# Alias for yn that only cares about the test failing
-(defun n: (test, fn) ->
-    (yn test, null, fn))
-
-# Tests for the conditions in order until something is truth
-(defun cond: (tests...) ->
-    (call (first tests, ((test) -> test()))))
-
-
-# --[ COMPARISON FUNCTIONS ]---------------------------------------------------
-# Compares a list using the given function.
-(defun cmp: (seq, fn) ->
-    (letb (slen = (len seq)) ->
-        (all seq, ((prev, idx) ->
-            (yn (idx + 1 >= slen), (-> true)
-                                 , (-> fn prev, (car (nth idx + 1, seq))))))))
-
-# Compares if all items on the list are loosely equal `l == r`
-(defun eq: (seq...) ->
-    (cmp seq, ((l, r) -> `l == r`)))
-
-# Compares if all items on the list are strictly equal `l === r`
-(defun eqs: (seq...) ->
-    (cmp seq, ((l, r) -> l is r)))
-
-# Compares if all preceding items are greater than their successors
-(defun gt: (seq...) ->
-    (cmp seq, ((l, r) -> l > r)))
-
-# Compares if all prec items are greater or loosely equal to their successors
-(defun gte: (seq...) ->
-    (cmp seq, ((l, r) -> (l >= r))))
-
-# Compares if all preceding items are lower than their sucessors
-(defun lt: (seq...) ->
-    (cmp seq, ((l, r) -> l < r)))
-
-# Compares fi all prec items are lower or loosely equal to their successors
-(defun lte: (seq...) ->
-    (cmp seq, ((l, r) -> (l <= r))))
-
+require './ops'
 
 
 # --[ ITERATION ]--------------------------------------------------------------
