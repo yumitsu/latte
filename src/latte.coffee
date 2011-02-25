@@ -52,11 +52,11 @@ latte =
 
 
 # --[ CONDITIONALS ]-----------------------------------------------------------
-# Makes a truthy tests, calls pass if it passes, fail otherwise
+# Makes a truth tests, calls pass if it passes, fail otherwise
 (defun yn: (test, pass, fail) ->
     (if test then pass?() else fail?()))
 
-# Tests for the conditions in order until something is truthy
+# Tests for the conditions in order until something is truth
 (defun cond: (tests...) ->
     (call (first tests, ((test) -> test()))))
 
@@ -90,8 +90,45 @@ latte =
 # Maps the values in the list according to the iterator function
 (defun map: _.map)
 
-# Returns the first value that passes a truthy test
+
+# --[ GENERAL COLLECTION HANDLING ]--------------------------------------------
+# Folds a list from top-down
+(defun fd: _.reduce)
+
+# Folds a list from bottom-up
+(defun fu: _.reduceRight)
+
+# Returns the first value that passes a truth test
 (defun first: _.detect)
+
+# Returns only values that pass a truth test in the given sequence
+(defun filter: _.select)
+
+# Returns a list without items that pass a truth test
+(defun reject: _.reject)
+
+# Returns true if all elements pass a truth test
+(defun all: _.all)
+
+# Returns true if at least one value pass a truth test
+(defun any: _.any)
+
+# Returns true if the sequence contains a value
+(defun has: _.include)
+
+# Returns the maximum value in the list
+(defun max: _.max)
+
+# Returns the minimum value in the list
+(defun min: _.min)
+
+# Returns a sorted list
+(defun sort: (seq, fn = (x) -> x) ->
+    (_.sort seq, fn))
+
+# Calls the a method in all items of the sequence
+(defun invoke: _.invoke)
+
 
 
 # --[ LIST PROCESSING ]--------------------------------------------------------
@@ -106,8 +143,8 @@ latte =
     (seq.slice idx, idx + count))
 
 # Returns the length of a sequence
-(defun len: (seq) ->
-    (seq.length))
+(defun len: _.size)
+
 
 
 # --[ TYPE HANDLING ]----------------------------------------------------------
