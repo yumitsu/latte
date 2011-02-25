@@ -48,6 +48,12 @@ latte =
 (set $break: {})
 
 
+# --[ CONDITIONALS ]-----------------------------------------------------------
+# Makes a truthy tests, calls pass if it passes, fail otherwise
+(defun yn: (test, pass, fail) ->
+    (if test then pass() else fail()))
+
+
 # --[ ITERATION ]--------------------------------------------------------------
 # Stepper generator
 (defun stepper: (seq, fn) ->
@@ -62,8 +68,8 @@ latte =
     (letb (slen = (len seq)) ->
         (stepper seq, (idx) ->
             (letb (n = idx + 1, item = (nth  idx, seq, 2)) ->
-                (n >= slen and (list n, $break)) \
-                           or  (list n, item)))))
+                (yn (n >= slen), (-> list n, $break)
+                               , (-> list n, item))))))
 
 # Arbitrary iterator over a sequence using a stepper generator
 (defun iter: (seq, stepper, fn) ->
