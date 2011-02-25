@@ -44,6 +44,34 @@ latte =
     (fn()))
 
 
+# --[ CONSTANTS ]--------------------------------------------------------------
+(set $break: {})
+
+
+# --[ ITERATION ]--------------------------------------------------------------
+# Stepper generator
+(defun stepper: (seq, fn) ->
+    (letb (idx = 0, item, next) ->
+        (next = ->
+            [idx, item] = fn(idx, seq)
+            next.item   = item)
+        (next)))
+
+# Pair stepper generator
+(defun pair_stepper: (seq) ->
+    (letb (slen = (len seq)) ->
+        (stepper seq, (idx) ->
+            (letb (n = idx + 1, item = (nth  idx, seq, 2)) ->
+                (n >= slen and (list n, $break)) \
+                           or  (list n, item)))))
+
+# Arbitrary iterator over a sequence using a stepper generator
+(defun iter: (seq, stepper, fn) ->
+    (step = (stepper seq))
+    (until step() is $break
+        (apply step.item, fn)))
+
+
 # --[ LIST PROCESSING ]--------------------------------------------------------
 # Returns the first element of a cons cell
 (defun car: (seq) ->
