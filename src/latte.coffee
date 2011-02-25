@@ -71,6 +71,14 @@ latte =
     (until step() is $break
         (apply step.item, fn)))
 
+# Iterates over the list of items calling the iterator function on all
+(defun each: (seq, fn) ->
+    (_.each seq, fn))
+
+# Maps the values in the list according to the iterator function
+(defun map: (seq, fn) ->
+    (_.map seq, fn))
+
 
 # --[ LIST PROCESSING ]--------------------------------------------------------
 # Returns the first element of a cons cell
