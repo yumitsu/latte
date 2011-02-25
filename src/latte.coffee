@@ -37,12 +37,15 @@ latte =
 (defun apply: (args, fn) ->
     (capply args, null, fn))
 
+# Calls a function
+(defun call: (args..., fn) ->
+    (fn.call args))
+
 
 # Takes advantage of CoffeeScript's default arguments and parameter closure for
 # faking a `let block` thingie
 (defun letb: (fn) ->
     (fn()))
-
 
 # --[ CONSTANTS ]--------------------------------------------------------------
 (set $break: {})
@@ -51,7 +54,11 @@ latte =
 # --[ CONDITIONALS ]-----------------------------------------------------------
 # Makes a truthy tests, calls pass if it passes, fail otherwise
 (defun yn: (test, pass, fail) ->
-    (if test then pass() else fail()))
+    (if test then pass?() else fail?()))
+
+# Tests for the conditions in order until something is truthy
+(defun cond: (tests...) ->
+    (call (first tests, ((test) -> test()))))
 
 
 # --[ ITERATION ]--------------------------------------------------------------
@@ -78,12 +85,13 @@ latte =
         (apply step.item, fn)))
 
 # Iterates over the list of items calling the iterator function on all
-(defun each: (seq, fn) ->
-    (_.each seq, fn))
+(defun each: _.each)
 
 # Maps the values in the list according to the iterator function
-(defun map: (seq, fn) ->
-    (_.map seq, fn))
+(defun map: _.map)
+
+# Returns the first value that passes a truthy test
+(defun first: _.detect)
 
 
 # --[ LIST PROCESSING ]--------------------------------------------------------
