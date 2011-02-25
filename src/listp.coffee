@@ -1,9 +1,7 @@
 ###############################################################################
-# ~ latte.coffee ~                                                            #
+# ~ latte/listp.coffee ~                                                      #
 #                                                                             #
-# A small Lispey dialect of coffee. Just for the sake of it :D                #
-#                                                                             #
-# Yes, the library leaks everything to globals, ain't that delicious? :3      #
+# General manipulation functions for list objects.                            #
 #                                                                             #
 #                                                                             #
 # --------------------------------------------------------------------------- #
@@ -15,18 +13,19 @@
 
 _ = require 'underscore'
 
-# Some meta information about the library
-latte =
-    version: '0.1.0'
+
+# --[ LIST PROCESSING ]--------------------------------------------------------
+# Returns the first element of a cons cell
+(defun car: _.first)
+
+# Returns the last element of a cons cell
+(defun cdr: _.rest)
+
+# Returns the nth element of a sequence
+(defun nth: (idx, seq, count = 1) ->
+    (seq.slice idx, idx + count))
+
+# Returns the length of a sequence
+(defun len: _.size)
 
 
-# --[ LATTE MODULES ]----------------------------------------------------------
-require './core'
-require './ops'
-require './collections'
-require './listp'
-
-
-# --[ TYPE HANDLING ]----------------------------------------------------------
-(defun list: (seq...) ->
-    (seq))
