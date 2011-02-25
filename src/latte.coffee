@@ -16,59 +16,52 @@
 _    = require 'underscore'
 root = global ? window
 
+latte =
+    version: '0.1.0'
+
 
 # --[ CORE ]-------------------------------------------------------------------
-# Defines a global variable
-root.setq = (name, value) ->
-    root[name] = value
+# Defines global variables
+(root.set = (obj) ->
+    ((root[name] = value) for name, value of obj))
 
-
-# Defines a named global function
-(setq "defun", (obj) ->
-    ((setq name, fn) for name, fn of obj))
-
+# Defines named global functions
+(set defun: (obj) ->
+    (set obj))
 
 # Calls a function with an explicit context
-(defun capply: (ctx, fn, args) ->
+(defun capply: (args, ctx, fn) ->
     (fn.apply ctx, args))
 
 # Applies a list of arguments to a function
-(defun apply:  (fn, args) ->
-    (capply null, fn, args))
+(defun apply: (args, fn) ->
+    (capply args, null, fn))
+
+
+# Takes advantage of CoffeeScript's default arguments and parameter closure for
+# faking a `let block` thingie
+(defun letb: (fn) ->
+    (fn()))
 
 
 # --[ LIST PROCESSING ]--------------------------------------------------------
-# Concatenates a sequence
-(defun cat: (seq...) ->
-    (reduce append, seq, []))
+# Returns the first element of a cons cell
+(defun car: (seq) ->
+    (_.first seq))
 
-# Folds a sequence from left to right
-(defun reduce: (fn, seq, sval) ->
-    (_.reduce seq, fn, sval))
+# Returns the last element of a cons cell
+(defun cdr: (seq) ->
+    (_.rest seq))
 
-# Folds a sequence from right to left
-(defun reduce_right: (fn, seq, sval) ->
-    (_.reduceRight seq, fn, sval))
+# Returns the nth element of a sequence
+(defun nth: (idx, seq, count = 1) ->
+    (seq.slice idx, idx + count))
 
-# Maps a sequence using a helper function
-(defun map: (fn, seq) ->
-    (_.map seq, fn))
-
-# Appends an item to a sequence
-(defun append: (seq, item) ->
-    (seq.push item))
-
-# Returns the first item of a sequence
-(defun car:  _.first)
-
-# Returns the rest of items of a sequence (everything but first)
-(defun cdr:  _.rest)
-
-# Creates a cons using given car and cdr values
-(defun cons: (left, right) ->
-    (cat (list left), right))
+# Returns the length of a sequence
+(defun len: (seq) ->
+    (seq.length))
 
 
 # --[ TYPE HANDLING ]----------------------------------------------------------
-# Casts any object to a list
-(defun list: (obj...) -> obj)
+(defun list: (seq...) ->
+    (seq))
