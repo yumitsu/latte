@@ -15,6 +15,11 @@
 _ = require 'underscore'
 
 
+# --[ CONSTANTS ]--------------------------------------------------------------
+# Used to indicate a given iteration should be stopped.
+(set $break: {})
+
+
 # --[ ITERATION ]--------------------------------------------------------------
 # Stepper generator
 (defun stepper: (seq, fn) ->
