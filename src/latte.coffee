@@ -56,9 +56,25 @@ latte =
 (defun yn: (test, pass, fail) ->
     (if test then pass?() else fail?()))
 
+# Alias for yn that only cares about the test failing
+(defun n: (test, fn) ->
+    (yn test, null, fn))
+
 # Tests for the conditions in order until something is truth
 (defun cond: (tests...) ->
     (call (first tests, ((test) -> test()))))
+
+
+# --[ COMPARISON FUNCTIONS ]---------------------------------------------------
+# Compares a list using the given function.
+(defun cmp: (seq, fn) ->
+    (letb (slen = (len seq)) ->
+        (all seq, ((prev, idx) ->
+            (yn (idx + 1 >= slen), (-> true)
+                                 , (-> fn prev, (nth idx, seq)))))))
+
+(defun eq: (seq...) ->
+    (cmp seq, ((l, r) -> `l == r`)))
 
 
 # --[ ITERATION ]--------------------------------------------------------------
