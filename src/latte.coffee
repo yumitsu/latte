@@ -96,12 +96,10 @@ latte =
 
 # --[ LIST PROCESSING ]--------------------------------------------------------
 # Returns the first element of a cons cell
-(defun car: (seq) ->
-    (_.first seq))
+(defun car: _.first)
 
 # Returns the last element of a cons cell
-(defun cdr: (seq) ->
-    (_.rest seq))
+(defun cdr: _.rest)
 
 # Returns the nth element of a sequence
 (defun nth: (idx, seq, count = 1) ->
