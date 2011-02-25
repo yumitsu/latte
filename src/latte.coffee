@@ -77,6 +77,27 @@ latte =
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
 
+# Compares if all items on the list are strictly equal `l === r`
+(defun eqs: (seq...) ->
+    (cmp seq, ((l, r) -> l is r)))
+
+# Compares if all preceding items are greater than their successors
+(defun gt: (seq...) ->
+    (cmp seq, ((l, r) -> l > r)))
+
+# Compares if all prec items are greater or loosely equal to their successors
+(defun gte: (seq...) ->
+    (cmp seq, ((l, r) -> (l >= r))))
+
+# Compares if all preceding items are lower than their sucessors
+(defun lt: (seq...) ->
+    (cmp seq, ((l, r) -> l < r)))
+
+# Compares fi all prec items are lower or loosely equal to their successors
+(defun lte: (seq...) ->
+    (cmp seq, ((l, r) -> (l <= r))))
+
+
 
 # --[ ITERATION ]--------------------------------------------------------------
 # Stepper generator
