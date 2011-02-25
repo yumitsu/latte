@@ -15,14 +15,7 @@
 
 _ = require 'underscore'
 
-# Some meta information about the library
-latte =
-    version: '0.1.0'
 
-
-# --[ LATTE MODULES ]----------------------------------------------------------
-require './core'
-require './ops'
-require './collections'
-require './listp'
-require './types'
+# --[ TYPE HANDLING ]----------------------------------------------------------
+(defun list: (seq...) ->
+    (seq))
