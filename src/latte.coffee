@@ -13,14 +13,11 @@
 #                        package for more information.                        #
 ###############################################################################
 
-_ = require 'underscore'
-
-# Some meta information about the library
 latte =
     version: '0.1.0'
 
 
-# --[ LATTE MODULES ]----------------------------------------------------------
+# --[ MODULES ]----------------------------------------------------------------
 require './core'
 require './ops'
 require './collections'

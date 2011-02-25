@@ -13,7 +13,6 @@
 #                        package for more information.                        #
 ###############################################################################
 
-_    = require 'underscore'
 root = global ? window
 
 
