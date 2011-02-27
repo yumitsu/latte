@@ -46,16 +46,16 @@
     (if test then pass?() else fail?()))
 
 
-################################################################################
-# Alias for ``yn`` that only cares about the test failing                      #
-#                                                                              #
-# See :js:func:`yn` for more information.                                      #
-#                                                                              #
-# :param          test: The value to test.                                     #
-# :param Function fn:   The function to call if the test fails.                #
-#                                                                              #
-# :returns: ``undefined`` if the test passes, the result of ``fn`` otherwise.  #
-################################################################################
+###############################################################################
+# Alias for ``yn`` that only cares about the test failing                     #
+#                                                                             #
+# See :js:func:`yn` for more information.                                     #
+#                                                                             #
+# :param          test: The value to test.                                    #
+# :param Function fn:   The function to call if the test fails.               #
+#                                                                             #
+# :returns: ``undefined`` if the test passes, the result of ``fn`` otherwise. #
+###############################################################################
 (defun n: (test, fn) ->
     (yn test, null, fn))
 
@@ -140,9 +140,47 @@
             (yn (idx + 1 >= slen), (-> true)
                                  , (-> fn prev, (car (nth idx + 1, seq))))))))
 
-# Compares if all items on the list are loosely equal `l == r`
+
+###############################################################################
+# Compares if all items on the list are loosely equal `l == r`.               #
+#                                                                             #
+# On each pair, type coercion is performed as needed — that is, if the items  #
+# being tested are not of the same type, JavaScript will convert them to a    #
+# common format that it can use to compare both.                              #
+#                                                                             #
+# JavaScript's type coercion is regarded by many (myself included) as weird,  #
+# but the rules are well defined, of course. The following table tries to     #
+# summarise it, but you can always check ECMAScript's algorithm for abstract  #
+# equality.                                                                   #
+#                                                                             #
+# +---------------+----------------+-----------------------------------+      #
+# |     Type A    |     Type B     |              Result               |      #
+# +===============+================+===================================+      #
+# | null          | undefined      | true                              |      #
+# +---------------+----------------+-----------------------------------+      #
+# | undefined     | null           | true                              |      #
+# +---------------+----------------+-----------------------------------+      #
+# | Number        | String         | A == ToNumber(B)                  |      #
+# +---------------+----------------+-----------------------------------+      #
+# | String        | Number         | ToNumber(A) == B                  |      #
+# +---------------+----------------+-----------------------------------+      #
+# | Boolean       | Any            | ToNumber(A) == B                  |      #
+# +---------------+----------------+-----------------------------------+      #
+# | Any           | Boolean        | A == ToNumber(B)                  |      #
+# +---------------+----------------+-----------------------------------+      #
+# | String|Number | Object         | A == ToPrimitive(B)               |      #
+# +---------------+----------------+-----------------------------------+      #
+# | Object        | String|Number  | ToPrimitive(A) == B               |      #
+# +---------------+----------------+-----------------------------------+      #
+#                                                                             #
+# For more information on Type conversion algorithms, you should check the    #
+# `ECMASpecs`_.                                                               #
+#                                                                             #
+# .. _ECMAScpecs: http://bclary.com/2004/11/07/#a-9                           #
+###############################################################################
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
+
 
 # Compares if all items on the list are strictly equal `l === r`
 (defun eqs: (seq...) ->
