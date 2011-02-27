@@ -177,14 +177,44 @@
 # `ECMASpecs`_.                                                               #
 #                                                                             #
 # .. _ECMAScpecs: http://bclary.com/2004/11/07/#a-9                           #
+#                                                                             #
+# For more information on how the comparison is performed, see :js:func:`cmp` #
+#                                                                             #
+# :param seq: Positional arguments with the items to compare.                 #
+#                                                                             #
+# :returns: ``true`` if all items are abstractly equal, ``false`` otherwise.  #
 ###############################################################################
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
 
 
-# Compares if all items on the list are strictly equal `l === r`
+###############################################################################
+# Compares if all items on the list are strictly equal `l === r`              #
+#                                                                             #
+# The strict comparison function is rather easier than the abstract equality  #
+# function, since there's no type coercion involved. For each pair of items,  #
+# it returns ``true`` if all items are of the same type and equal to each     #
+# other, and ``false`` if they aren't.                                        #
+#                                                                             #
+# Note that this functions doesn't do deep comparisons for Objects. In this   #
+# case, one object will only be considered equal to another where they're     #
+# exactly the same — they refer to the same object.                           #
+#                                                                             #
+# For example, the following would actually yield ``false``::                 #
+#                                                                             #
+#     >>> (seq (list 1, 2, 3), (list 1, 2, 3))                                #
+#     false                                                                   #
+#                                                                             #
+# Since the lists points to distinct objects, despite having being            #
+# equivalent.                                                                 #
+#                                                                             #
+# :param seq: Positional arguments for each item to compare.                  #
+#                                                                             #
+# :returns: ``true`` if all items are equal, ``false`` otherwise.             #
+###############################################################################
 (defun eqs: (seq...) ->
     (cmp seq, ((l, r) -> l is r)))
+
 
 # Compares if all preceding items are greater than their successors
 (defun gt: (seq...) ->
