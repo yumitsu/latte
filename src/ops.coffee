@@ -98,7 +98,42 @@
 
 
 # --[ COMPARISON FUNCTIONS ]---------------------------------------------------
-# Compares a list using the given function.
+###############################################################################
+# Compares a list using the given function.                                   #
+#                                                                             #
+# This is a general comparison function, that takes a sequence as the first   #
+# argument and a function as the second.                                      #
+#                                                                             #
+# The sequence is iterated using `all`. For each pair of items in the         #
+# sequence the callback function is called and expected to return whether the #
+# comparison for the given pair succeeds or fails.                            #
+#                                                                             #
+# If said callback returns any falsy value, the iteration is stopped and the  #
+# comparison fails — false is returned. Otherwise, if the iteration completes #
+# successfully, the comparison succeeds — true is returned.                   #
+#                                                                             #
+# Example::                                                                   #
+#                                                                             #
+#     >>> (cmp (list 1, 2, 3, 4), ((left, right) -> left < right))            #
+#     true                                                                    #
+#                                                                             #
+# Is the equivalent of::                                                      #
+#                                                                             #
+#     >>> 1 < 2 < 3 < 4                                                       #
+#     true                                                                    #
+#                                                                             #
+# Or in plain JavaScript, which reproduces better (and more explicitly) what  #
+# actually happens::                                                          #
+#                                                                             #
+#     >>> (1 < 2) && (2 < 3) && (3 < 4)                                       #
+#     true                                                                    #
+#                                                                             #
+# :param Array seq: The sequence to test.                                     #
+# :param Function fn: The function to test the pairs in the sequence          #
+#                                                                             #
+# :results: ``true`` or ``false``, depending on the success of the            #
+#           comparison.                                                       #
+###############################################################################
 (defun cmp: (seq, fn) ->
     (letb (slen = (len seq)) ->
         (all seq, ((prev, idx) ->
