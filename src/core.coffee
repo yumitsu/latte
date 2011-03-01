@@ -17,8 +17,8 @@ root = global ? window
 #
 # For handling these assignments to the global scope, Latte provides two
 # basic functions:
-
-
+#
+#
 #### Function `set` ###########################################################
 #
 #     fun set obj:obj → list
@@ -223,5 +223,5 @@ root = global ? window
 #     })
 ###############################################################################
 (defun letb: (fn) ->
-    (fn()))
+    (call fn))
 
