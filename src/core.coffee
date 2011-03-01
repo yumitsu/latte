@@ -161,6 +161,7 @@ root = global ? window
 #
 #     fun call fun:fn, args... → result of calling fn
 #
+#
 # And last, but not least, there is `call`. Which was only introduced to get
 # rid of the fugly, fugly function calls that doesn't use parameters.
 #
@@ -180,44 +181,46 @@ root = global ? window
     (apply args, fn))
 
 
-###############################################################################
-# Creates local variables, optionally assigning them some value.              #
-#                                                                             #
-# This is really necessary to have, because unlike JavaScript, CoffeeScript   #
-# has just no way of explicitly setting local variables. Instead, it'll set   #
-# the variable to local if it doesn't exist in any of the enclosing escopes,  #
-# otherwise it'll just use the enclosing escope variable.                     #
-#                                                                             #
-# And this would do just so many wrong things in Latte...                     #
-#                                                                             #
-# At any rate, this takes advantage of CoffeeScript's default arguments and   #
-# closures (hey, parameters are all local) for faking a ``let block``         #
-# thingie.                                                                    #
-#                                                                             #
-# It's also not the same as ``do (x = 2) -> x * x``, do is used to            #
-# automagically creating a closure using the variables in the current scope,  #
-# whereas ``letb`` creates entire fresh variables.                            #
-#                                                                             #
-# ``do (x = 2) -> x * x`` is expanded in the following::                      #
-#                                                                             #
-#     (function(x) {                                                          #
-#         if (x == null) x = 2                                                #
-#         return x * x                                                        #
-#     })(x)                                                                   #
-#                                                                             #
-# ``letb (x) -> x * x`` is expanded in the following::                        #
-#                                                                             #
-#     letb(function(x) {                                                      #
-#         if (x == null) x = 2                                                #
-#         return x * x                                                        #
-#     })                                                                      #
-#                                                                             #
-# Since ``x`` inside that function will always be null, it effectively        #
-# reproduces the behaviour of a ``let`` block.                                #
-#                                                                             #
-# :param Function fn: Function defining the new scope.                        #
-#                                                                             #
-# :returns: Whatever ``fn`` returns.                                          #
+## Local variables ############################################################
+#
+# So, `set` and `defun` are great constructs, but they have a big flaw: they
+# can only create global variables and functions. Sometimes you just want to
+# name a rather long (or expensive) expression that you'll be using on more
+# than one place.
+#
+# In Lisp you have the `let` constructs, which creates variables that are local
+# to the block they define.
+#
+# In JavaScript/CoffeeScript, you have lexically scoped variables. That is,
+# local functions can only be local in a function-basis, and sometimes you'd
+# need to use them in a block-basis. Worse still, in CoffeeScript you have no
+# way of **explicitly** declarating a variable as only local to the current
+# scope, since it'll use any variable in the enclosing scopes if they're
+# available (at compile time).
+#
+# Now, while this may be okay for most of the CoffeeScript things, it would
+# just go plain wrong with Latte and any more functional-centered programming.
+#
+# The solution was to fake this `let` construct in Lisp languages, taking
+# advantage of CoffeeScript's default arguments for functions, and JavaScript's
+# closures (hey, function parameters are all local :D)
+#
+#
+#### Function `letb` ##########################################################
+#
+#     fun letb fun:fn → result of calling fn
+#
+#
+# The `letb` function is basically a function that takes another function and
+# calls it immediately, with no arguments — thus all the arguments will
+# fallback to their default values.
+#
+# As an example, the call `letb (x=2) -> x * x` is expanded in the following:
+#
+#     letb(function(x) {
+#         if (x == null) x = 2
+#         return x * x
+#     })
 ###############################################################################
 (defun letb: (fn) ->
     (fn()))
