@@ -1,103 +1,131 @@
 ###############################################################################
-# ~ latte/ops.coffee ~                                                        #
-#                                                                             #
-# Defines general operators for handling data.                                #
-#                                                                             #
-#                                                                             #
-# --------------------------------------------------------------------------- #
-#         Copyright (c) Quildreen Motta <http://www.mottaweb.com.br/>         #
-#                                                                             #
-#  Licenced under MIT/X11. See ``LICENCE.txt`` in the root directory of the   #
-#                        package for more information.                        #
-###############################################################################
+#
+# As an imperative language, JavaScript (and CoffeeScript) define operators to
+# handle data. But these operators are nowhere as powerful as their Lisp
+# counterpart, and they don't feel `functional` as well.
+#
+# To solve this minor nitpicking of mine, all general operators are rewritten
+# as functions by this module. While certainly slower than the built-in
+# symbols, they are more convenient and blend in better with the flow of the
+# code.
 
 
-# --[ CONDITIONALS ]-----------------------------------------------------------
-###############################################################################
-# Makes a truth tests, calls ``pass`` if it passes, ``fail`` otherwise.       #
-#                                                                             #
-# YepNope will check whether the given test is *truthy* in JavaScript. The    #
-# language defines a few values that are *falsy*, whereas all the others are  #
-# considered *truthy*.                                                        #
-#                                                                             #
-# The following is a list of JavaScript's *falsy* values:                     #
-#                                                                             #
-# - empty string ``""``                                                       #
-# - the Number ``0``                                                          #
-# - the boolean primitive ``false``                                           #
-# - ``null``                                                                  #
-# - ``undefined``                                                             #
-#                                                                             #
-# Everything else is considered *truthy*, including empty lists (``[]``) or   #
-# empty objects (``{}``).                                                     #
-#                                                                             #
-# .. warning::                                                                #
-#    ``new Boolean(false)`` is an Object and therefore considered **truthy**, #
-#    same goes for ``new Number(0)``, ``new String("")``.                     #
-#                                                                             #
-# :param          test: The value to test.                                    #
-# :param Function pass: The function to call if the test passes.              #
-# :param Function fail: The function to call if the test fails.               #
-#                                                                             #
-# :returns: the result of ``pass`` if the test passes, the result of ``fail`` #
-#           otherwise.                                                        #
+## Conditionals ###############################################################
+#
+# In order to map our truth testing constructs to functions in CoffeeScript we
+# first have to solve the problem of controlling the flow of the program. So,
+# where a construct would execute code `x` when a test passes, or test `y` when
+# a test fails, the program must be able to manipulate this control flow.
+#
+# Given they would be simple expressions passed in the parameters, the only way
+# this could work would be by wrapping each possible branch of the flow in a
+# function, this way it wouldn't be evaluated right after the definition.
+#
+# The following functions all rely on this workaround to manipulate
+# JavaScript's control flow, taking advantage of the sweet syntax for defining
+# anonymous function in CoffeeScript.
+#
+# The most common case of branching is an `if-else` construct, that defines a
+# piece of code to be executed when an arbitrary condition passes a truth test,
+# or another piece of code otherwise.
+#
+# For these Latte provides a simple `YepNope` function, that will take a
+# boolean expression, and two functions. The first function (`pass`) will be
+# called when the expression is **truthy**, and the second (`fail`) when the
+# expression is **falsy**.
+#
+# JavaScript has the following values as **falsy** ones:
+#
+# - empty string (`""`)
+# - the number `0`
+# - the boolean primitive `false`
+# - `null`
+# - `undefined`
+#
+# Everything else is considered **truthy**, including empty lists (`[]`) and
+# empty objects (`{}`)
+#
+# Note that `new Boolean(false)` is an Object, and therefore **truthy**. The
+# same goes for `new Number(0)` and `new String("")`.
+
+
+#### Function `yn` ############################################################
+#
+#     fun yn bool:test, fun:pass, fun:fail → pass() or fail() depending on test
+#
+#
+# The function is the basic `YepNope` construct in Latte. It'll call the
+# function passed in the `pass` argument when `test` is truthy and `false`
+# otherwise, returning the values of those calls:
+#
+#     >>> (yn [], (-> "yay"), (-> "nay"))
+#     "yay"
+#     >>> (yn "", (-> "yay"), (-> "nay"))
+#     "nay"
+#
 ###############################################################################
 (defun yn: (test, pass, fail) ->
     (if test then pass?() else fail?()))
 
 
-###############################################################################
-# Alias for ``yn`` that only cares about the test failing                     #
-#                                                                             #
-# See :js:func:`yn` for more information.                                     #
-#                                                                             #
-# :param          test: The value to test.                                    #
-# :param Function fn:   The function to call if the test fails.               #
-#                                                                             #
-# :returns: ``undefined`` if the test passes, the result of ``fn`` otherwise. #
+#### Function `n` #############################################################
+#
+#     fun n bool:test, fun:fn → fn() if test is falsy, undefined otherwise
+#
+#
+# If you only care about failing though, you don't need to go through the whole
+# `YepNope` construct. In this case the `n` function works as an `unless`
+# clause. That is, it calls the function only if the test fails:
+#
+#     >>> (n 0 (-> "foo"))
+#     "foo"
+#     >>> (n 1 (-> "foo"))
+#     undefined
+#
 ###############################################################################
 (defun n: (test, fn) ->
     (yn test, null, fn))
 
 
-###############################################################################
-# Tests for the conditions in order until something is truth.                 #
-#                                                                             #
-# The ``cond`` operator is the answer for all those stuff you'd do with a     #
-# if/else if/else block in JavaScript. It takes as many positional functions  #
-# as you need, and starts calling these functions in order.                   #
-#                                                                             #
-# When a function returns anything other than ``null`` or ``undefined`` that  #
-# value is then returned from the condition and the iteration is stopped.     #
-#                                                                             #
-# Since all of the positional arguments are functions that are called in      #
-# order to decide if they should be used as the return value, you have to use #
-# another thing for testing your expressions (if you want to). The YepNope    #
-# (:js:func:`yn`) is pretty useful for that!                                  #
-#                                                                             #
-# Example::                                                                   #
-#                                                                             #
-#     >>> (letb (x = "bar") ->                                                #
-#     ...  (cond (-> (yn x == "foo", -> "x is foo!"))                         #
-#     ...      , (-> (yn x == "bar", -> "x is bar!"))                         #
-#     ...      , (-> (yn y == x, -> "nowai!"))))                              #
-#     ...                                                                     #
-#     "x is bar!"                                                             #
-#                                                                             #
-# Note that there's no problem in the next function comparing ``y`` to ``x``, #
-# even though ``y`` is not defined in that context. This is because since the #
-# previous test passes, the ``cond`` function doesn't even bother with the    #
-# other ones.                                                                 #
-#                                                                             #
-# :param Function tests: Positional functions to test.                        #
-#                                                                             #
-# :returns: Whatever the first function to pass the nullable test returns.    #
+#### Function `cond` ##########################################################
+#
+#     fun cond tests... → the result of the first condition to pass
+#
+#
+# When you need to test for several different conditions, the `YepNope` pattern
+# obviously gets out of hand. The Shceme's `cond` construct was also ported to
+# Latte, using the same premises as the above functions.
+#
+# It accepts any number of `test conditions` — functions that return null or
+# undefined if the condition fails, or anything else if it passes. All of the
+# conditions are evaluated in order, and when one of the test passes it's
+# return value is returned from the function and iteration stops.
+#
+# Since all of the positional arguments are just functions to be called, in
+# order to decide if they should be used as the return value you'll often need
+# to test another arbitrary condition. The `YepNope` pattern is pretty useful
+# here:
+#
+#     >>> (letb (x = "bar") ->
+#     ...   (cond (-> (yn (eq x, "foo"), -> "x is foo!"))
+#     ...       , (-> (yn (eq x, "bar"), -> "x is bar!"))
+#     ...       , (-> (yn (eq y, x),     -> "nowai!"))))
+#     ...
+#     "x is bar!"
+#
+#
+# Note that since iteration stops after the first match (`x == bar`), there's
+# no problem in having the next function compare `y` to `x`, even though `y` is
+# not defined in the context — `cond` won't even bother calling the other
+# functions.
 ###############################################################################
 (defun cond: (tests...) ->
     (call (first tests, ((test) -> test()?))))
 
 
-# --[ COMPARISON FUNCTIONS ]---------------------------------------------------
+## Comparison #################################################################
+#
+#
 ###############################################################################
 # Compares a list using the given function.                                   #
 #                                                                             #
