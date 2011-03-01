@@ -1,0 +1,193 @@
+<!DOCTYPE html>  <html> <head>   <title>core.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="latte.html">                 latte.coffee               </a>                                           <a class="source" href="listp.html">                 listp.coffee               </a>                                           <a class="source" href="ops.html">                 ops.coffee               </a>                                           <a class="source" href="types.html">                 types.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               core.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>The core module provides the most basic functionality in which everything
+else relies on. The goal of this module is abstracting usual JavaScript and
+CoffeeScript constructs, which use an imperative programming structure, like
+assignments, function definitions and so on, to conform with Lisp's DSL
+syntax.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">root</span> <span class="o">=</span> <span class="nx">global</span> <span class="o">?</span> <span class="nb">window</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h1>Defining variables</h1>
+
+<p>Since you don't have pointers in JavaScript and can't really dynamically set
+variables in the local scope, Latte leaks everything into the global object
+(which can be either <code>global</code> or <code>window</code>), depending on the environment in
+which the library is running.</p>
+
+<p>For handling these assignments to the global scope, Latte provides two
+basic functions:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Function <code>set</code></h3>
+
+<pre><code>fun set obj:obj → list
+</code></pre>
+
+<p>The <code>set</code> function is used to define global variables. It accepts a single
+argument: a JavaScript object, and unpacks all of it's properties in the
+global scope, that is, every key=value pair in the given object is placed in
+the global object.</p>
+
+<p>Take the following example. It receives an object containing two properties:
+<code>foo</code> and <code>bar</code>, and unpacks them to the global scope:</p>
+
+<pre><code>&gt;&gt;&gt; (set foo: 1, bar: -1)
+[1, -1]
+</code></pre>
+
+<p>After executing this snippet, we'll have two new properties in the global
+scope: <code>foo=1</code> and <code>bar=-1</code>. They're accessible as any other global variable
+in javascript, no explicit prefixing needed:</p>
+
+<pre><code>&gt;&gt;&gt; foo
+1
+&gt;&gt;&gt; bar
+-1
+&gt;&gt;&gt; (global ? window).foo
+1
+</code></pre>
+
+<p>As an effect of the way CoffeeScript is structured — implicit return
+statements are placed at the end of the function — the <code>set</code> function will
+also return a list with all the values in the given object.</p>
+
+<p>Lists in Latte are exactly the same thing as JavaScript's Arrays. They're
+not real Lisp lists, although still referred as such.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">set</span> <span class="o">=</span> <span class="p">(</span><span class="nx">obj</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">((</span><span class="nx">root</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">value</span><span class="p">)</span> <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">value</span> <span class="k">of</span> <span class="nx">obj</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h3>Function <code>defun</code></h3>
+
+<pre><code>fun defun obj:obj → list
+</code></pre>
+
+<p>And the <code>defun</code> function, which is just an alias for <code>set</code>, intended to
+distinguish function definitions from general variable definitions, thus
+making the source code more readable — hell yeah semantics!</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">set</span> <span class="nv">defun: </span><span class="nx">set</span><span class="p">)</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h1>Calling functions</h1>
+
+<p>Functions in CoffeeScript can be called in two ways, either by surrounding
+the parameters in parenthesis, or by omitting the parenthesis altogether.</p>
+
+<pre><code>&gt;&gt;&gt; [1, 2, 3].slice 1
+[2, 3]
+
+&gt;&gt;&gt; [1, 2, 3].slice(1)
+[2, 3]
+</code></pre>
+
+<p>There's however some problems with the no-parens syntax: conflicts. And you
+don't know whether you'd like to actually call a function or return a
+reference to it.</p>
+
+<p>CoffeeScript handles this by requiring function calls with no parameters to
+be explicit:</p>
+
+<pre><code>&gt;&gt;&gt; set
+function(obj) { var name, value, _results; ... }
+
+&gt;&gt;&gt; set()
+[]
+</code></pre>
+
+<p>To conform a bit more with Lisp's DSL, Latte uses the same parenthesis
+conventions. Basically, all function calls are wrapped in parenthesis:</p>
+
+<pre><code>&gt;&gt;&gt; (set x: 1)
+[1]
+</code></pre>
+
+<p>This also removes all the problems that comes with conflicts by omitting
+parenthesis in JavaScript, and makes the code more consistent:</p>
+
+<pre><code>&gt;&gt;&gt; nth 1, list 1, 2, 3, 4, 2
+[2]
+
+&gt;&gt;&gt; (nth 1, (list 1, 2, 3, 4), 2)
+[2, 3]
+</code></pre>
+
+<p>The downside of the syntax is that you still can't omit the commas in your
+parameters, which sometimes can lead to fairly cluttered syntax.</p>
+
+<p>Then we get down to what execution context is used in the function being
+called. By JavaScript's rules, whenever a function is called as anything
+besides a <code>method</code>, the execution context will be the global scope (or <code>null</code>
+in strict mode).</p>
+
+<pre><code>&gt;&gt;&gt; (defun stuff: this == global)
+&gt;&gt;&gt; (stuff)
+true
+</code></pre>
+
+<p>However, sometimes you want to apply a function to another object. Latte
+offers some syntax for this as well:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>Function <code>capply</code></h3>
+
+<pre><code>fun capply list:args, obj: ctx, fun:fn → result of calling fn
+</code></pre>
+
+<p>The <code>capply</code> function calls a function and assigns an explicit execution
+context to it — that is, in the function being called, <code>this</code> will refer to
+any object that <code>capply</code> received as context.</p>
+
+<p>Where a context object is not given, the same context rules above apply.</p>
+
+<p>Additionally, the function accepts a list as its first argument, which will
+be passed as positional arguments for the function to be called. If you don't
+want to set the context of the function, however, you can read up to the
+<code>apply</code> function.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">capply: </span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">args</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>Function <code>apply</code></h3>
+
+<pre><code>fun apply list:args, fun:fn → result of calling fn
+</code></pre>
+
+<p>Apply is used to apply a list of arguments to a function, rather than an
+execution context. It's basically an alias to <code>capply</code>, but using a null
+context.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">apply: </span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">capply</span> <span class="nx">args</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h3>Function <code>call</code></h3>
+
+<pre><code>fun call fun:fn, args... → result of calling fn
+</code></pre>
+
+<p>And last, but not least, there is <code>call</code>. Which was only introduced to get
+rid of the fugly, fugly function calls that doesn't use parameters.</p>
+
+<p>Take a look at the following example and see how the explicit <code>call</code> function
+is more readable, and blends better with the overall syntax:</p>
+
+<pre><code>&gt;&gt;&gt; (defun get_list: -&gt; (list "foo", "bar"))
+&gt;&gt;&gt; (car (get_list()))
+"foo"
+
+&gt;&gt;&gt; (car (call get_list))
+"foo"
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">call: </span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">args</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">apply</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h1>Local variables</h1>
+
+<p>So, <code>set</code> and <code>defun</code> are great constructs, but they have a big flaw: they
+can only create global variables and functions. Sometimes you just want to
+name a rather long (or expensive) expression that you'll be using on more
+than one place.</p>
+
+<p>In Lisp you have the <code>let</code> constructs, which creates variables that are local
+to the block they define.</p>
+
+<p>In JavaScript/CoffeeScript, you have lexically scoped variables. That is,
+local functions can only be local in a function-basis, and sometimes you'd
+need to use them in a block-basis. Worse still, in CoffeeScript you have no
+way of <strong>explicitly</strong> declarating a variable as only local to the current
+scope, since it'll use any variable in the enclosing scopes if they're
+available (at compile time).</p>
+
+<p>Now, while this may be okay for most of the CoffeeScript things, it would
+just go plain wrong with Latte and any more functional-centered programming.</p>
+
+<p>The solution was to fake this <code>let</code> construct in Lisp languages, taking
+advantage of CoffeeScript's default arguments for functions, and JavaScript's
+closures (hey, function parameters are all local :D)</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h3>Function <code>letb</code></h3>
+
+<pre><code>fun letb fun:fn → result of calling fn
+</code></pre>
+
+<p>The <code>letb</code> function is basically a function that takes another function and
+calls it immediately, with no arguments — thus all the arguments will
+fallback to their default values.</p>
+
+<p>As an example, the call <code>letb (x=2) -&gt; x * x</code> is expanded in the following:</p>
+
+<pre><code>letb(function(x) {
+    if (x == null) x = 2
+    return x * x
+})
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">letb: </span><span class="p">(</span><span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">call</span> <span class="nx">fn</span><span class="p">))</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
