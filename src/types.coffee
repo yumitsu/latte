@@ -13,6 +13,8 @@
 #                        package for more information.                        #
 ###############################################################################
 
+_ = require 'underscore'
+
 
 # --[ TYPE HANDLING ]----------------------------------------------------------
 # Returns a list with the given positional arguments as items

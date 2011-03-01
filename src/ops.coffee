@@ -231,4 +231,3 @@
 # Compares fi all prec items are lower or loosely equal to their successors
 (defun lte: (seq...) ->
     (cmp seq, ((l, r) -> (l <= r))))
-
