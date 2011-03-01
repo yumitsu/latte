@@ -9,7 +9,7 @@
 # have to use lambda functions for each case, and so on.
 #
 # There's also no macros, nor quasiquoting. One could implement such features
-# on top of this sample impelementation, of course. Since all top-level
+# on top of this sample implementation, of course. Since all top-level
 # functions are (or rather should be) defined through the `defun` function,
 # one could write a hook that preprocesses the function code to implement real
 # macros, or at least something closer to Lisp's one.
