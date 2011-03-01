@@ -1,42 +1,70 @@
 ###############################################################################
-# ~ latte/core.coffee ~                                                       #
-#                                                                             #
-# The core module provides the most basic functionality that everything else  #
-# relies on. They effectively exist only to make the transition from          #
-# CoffeeScript to Latte possible.                                             #
-#                                                                             #
-#                                                                             #
-# --------------------------------------------------------------------------- #
-#         Copyright (c) Quildreen Motta <http://www.mottaweb.com.br/>         #
-#                                                                             #
-#  Licenced under MIT/X11. See ``LICENCE.txt`` in the root directory of the   #
-#                        package for more information.                        #
+# The core module provides the most basic functionality in which everything
+# else relies on. The goal of this module is abstracting usual JavaScript and
+# CoffeeScript constructs, which use an imperative programming structure, like
+# assignments, function definitions and so on, to conform with Lisp's DLS
+# syntax.
+#
+# Since you don't have pointers in JavaScript and can't really dynamically set
+# variables in the local scope, Latte leaks everything into the global object
+# (which can be either `global` or `window`), depending on the environment in
+# which the library is running.
 ###############################################################################
-
 root = global ? window
 
 
 ###############################################################################
-# Defines global variables.                                                   #
-#                                                                             #
-# The function takes a JavaScript object, mapping keys to arbitrary values,   #
-# and unpacks everything in the global escope, depending on the environment.  #
-#                                                                             #
-# :param Object obj: object to unpack properties.                             #
-#                                                                             #
-# :returns: A list of all the values in the object.                           #
+# For handling these assignments to the global escope, Latte provides two
+# basic functions:
+
+
+### Function `set` ############################################################
+#
+#     fun set obj:obj → list
+#
+#
+# The `set` function is used to define global variables. It accepts a single
+# argument: a JavaScript object, and unpacks all of it's properties in the
+# global scope, that is, every key=value pair in the given object is placed in
+# the global object.
+#
+# Take the following example. It receives an object containing two properties:
+# `foo` and `bar`, and unpacks them to the global scope:
+#
+#     >>> (set foo: 1, bar: -1)
+#     [1, -1]
+#
+# After executing this snippet, we'll have two new properties in the global
+# scope: `foo=1` and `bar=-1`. They're acessible as any other global variable
+# in javascript, no explicit prefixing needed:
+#
+#     >>> foo
+#     1
+#     >>> bar
+#     -1
+#     >>> (global ? window).foo
+#     1
+#
+# As an effect of the way CoffeeScript is structured — implicit return
+# statements are placed at the end of the function — the `set` function will
+# also return a list with all the values in the given object.
+#
+# Lists in Latte are exactly the same thing as JavaScript's Arrays. They're
+# not real Lisp lists, although still referred as such.
 ###############################################################################
 (root.set = (obj) ->
     ((root[name] = value) for name, value of obj))
 
 
-###############################################################################
-# Defines named global functions.                                             #
-#                                                                             #
-# This is just a alias for :js:func:`set`, intended to make distinguishing    #
-# function definitions from general variable definitions easier and more      #
-# readable.                                                                   #
-###############################################################################
+### Function `defun` ##########################################################
+#
+#     fun defun obj:obj → list
+#
+#
+# And the `defun` function, which is just an alias for `set`, intended to
+# distinguish function definitions from general variable definitions, thus
+# making the source code more readable — hell yeah semantics!
+##############################################################################
 (set defun: set)
 
 
