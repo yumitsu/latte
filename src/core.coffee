@@ -17,8 +17,8 @@ root = global ? window
 #
 # For handling these assignments to the global scope, Latte provides two
 # basic functions:
-#
-#
+
+
 #### Function `set` ###########################################################
 #
 #     fun set obj:obj → list
@@ -122,8 +122,8 @@ root = global ? window
 #
 # However, sometimes you want to apply a function to another object. Latte
 # offers some syntax for this as well:
-#
-#
+
+
 #### Function `capply` ########################################################
 #
 #     fun capply list:args, obj: ctx, fun:fn → result of calling fn
@@ -174,8 +174,6 @@ root = global ? window
 #
 #     >>> (car (call get_list))
 #     "foo"
-#
-#
 ###############################################################################
 (defun call: (fn, args...) ->
     (apply args, fn))
@@ -204,8 +202,8 @@ root = global ? window
 # The solution was to fake this `let` construct in Lisp languages, taking
 # advantage of CoffeeScript's default arguments for functions, and JavaScript's
 # closures (hey, function parameters are all local :D)
-#
-#
+
+
 #### Function `letb` ##########################################################
 #
 #     fun letb fun:fn → result of calling fn
