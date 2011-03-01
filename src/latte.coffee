@@ -26,7 +26,7 @@ latte =
     version: '0.1.0'
 
 
-### Modules ###################################################################
+## Modules ####################################################################
 #
 # As a modular library, Latte's functionality is separated by topics. At it's
 # very core, the [core](core.html) module provides everything that's needed to
