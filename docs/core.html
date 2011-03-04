@@ -109,30 +109,20 @@ true
 </code></pre>
 
 <p>However, sometimes you want to apply a function to another object. Latte
-offers some syntax for this as well:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>Function <code>capply</code></h3>
+offers some syntax for this as well:</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h3>Function <code>apply</code></h3>
 
-<pre><code>fun capply list:args, obj: ctx, fun:fn → result of calling fn
+<pre><code>fun apply fun:fn, list:args, obj: ctx → result of calling fn
 </code></pre>
 
-<p>The <code>capply</code> function calls a function and assigns an explicit execution
+<p>The <code>apply</code> function calls a function and assigns an explicit execution
 context to it — that is, in the function being called, <code>this</code> will refer to
-any object that <code>capply</code> received as context.</p>
+any object that <code>apply</code> received as context.</p>
 
 <p>Where a context object is not given, the same context rules above apply.</p>
 
 <p>Additionally, the function accepts a list as its first argument, which will
-be passed as positional arguments for the function to be called. If you don't
-want to set the context of the function, however, you can read up to the
-<code>apply</code> function.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">capply: </span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">args</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>Function <code>apply</code></h3>
-
-<pre><code>fun apply list:args, fun:fn → result of calling fn
-</code></pre>
-
-<p>Apply is used to apply a list of arguments to a function, rather than an
-execution context. It's basically an alias to <code>capply</code>, but using a null
-context.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">apply: </span><span class="p">(</span><span class="nx">args</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
-    <span class="p">(</span><span class="nx">capply</span> <span class="nx">args</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h3>Function <code>call</code></h3>
+be passed as positional arguments for the function to be called.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">apply: </span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">ctx</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">fn</span><span class="p">.</span><span class="nx">apply</span> <span class="nx">ctx</span><span class="p">,</span> <span class="nx">args</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>Function <code>call</code></h3>
 
 <pre><code>fun call fun:fn, args... → result of calling fn
 </code></pre>
@@ -150,7 +140,7 @@ is more readable, and blends better with the overall syntax:</p>
 &gt;&gt;&gt; (car (call get_list))
 "foo"
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">call: </span><span class="p">(</span><span class="nx">fn</span><span class="p">,</span> <span class="nx">args</span><span class="p">...)</span> <span class="o">-&gt;</span>
-    <span class="p">(</span><span class="nx">apply</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h1>Local variables</h1>
+    <span class="p">(</span><span class="nx">apply</span> <span class="nx">args</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h1>Local variables</h1>
 
 <p>So, <code>set</code> and <code>defun</code> are great constructs, but they have a big flaw: they
 can only create global variables and functions. Sometimes you just want to
@@ -172,7 +162,7 @@ just go plain wrong with Latte and any more functional-centered programming.</p>
 
 <p>The solution was to fake this <code>let</code> construct in Lisp languages, taking
 advantage of CoffeeScript's default arguments for functions, and JavaScript's
-closures (hey, function parameters are all local :D)</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h3>Function <code>letb</code></h3>
+closures (hey, function parameters are all local :D)</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h3>Function <code>letb</code></h3>
 
 <pre><code>fun letb fun:fn → result of calling fn
 </code></pre>
