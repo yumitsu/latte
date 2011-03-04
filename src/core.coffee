@@ -190,7 +190,7 @@ root = global ? window
 # to the block they define.
 #
 # In JavaScript/CoffeeScript, you have lexically scoped variables. That is,
-# local functions can only be local in a function-basis, and sometimes you'd
+# local variables can only be local in a function-basis, and sometimes you'd
 # need to use them in a block-basis. Worse still, in CoffeeScript you have no
 # way of **explicitly** declarating a variable as only local to the current
 # scope, since it'll use any variable in the enclosing scopes if they're
