@@ -29,9 +29,8 @@ latte =
 ## Modules ####################################################################
 #
 # As a modular library, Latte's functionality is separated by topics. At it's
-# very core, the [core](core.html) module provides everything that's needed to
-# change the JavaScript/CoffeeScript workflow to something closer to
-# Lisp.
+# very core, the **core** module provides everything that's needed to change
+# the JavaScript/CoffeeScript workflow to something closer to Lisp.
 #
 # Basically the core includes functionality that's shared and relied on by all
 # the other modules, like function and variable definition, let blocks and so
@@ -45,11 +44,11 @@ latte =
 # - [listp][]       — functions to manipulate vectors and lists.
 # - [types][]       — functions to handle type checking and coercion.
 #
-# [core]:        core.html
-# [ops]:         ops.html
-# [collections]: collections.html
-# [listp]:       listp.html
-# [types]:       types.html
+# [core]:        docs/core.html
+# [ops]:         docs/ops.html
+# [collections]: docs/collections.html
+# [listp]:       docs/listp.html
+# [types]:       docs/types.html
 ################################################################################
 require './core'
 require './ops'
