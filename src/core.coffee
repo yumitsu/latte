@@ -124,37 +124,22 @@ root = global ? window
 # offers some syntax for this as well:
 
 
-#### Function `capply` ########################################################
+#### Function `apply` ########################################################
 #
-#     fun capply list:args, obj: ctx, fun:fn → result of calling fn
+#     fun apply fun:fn, list:args, obj: ctx → result of calling fn
 #
 #
-# The `capply` function calls a function and assigns an explicit execution
+# The `apply` function calls a function and assigns an explicit execution
 # context to it — that is, in the function being called, `this` will refer to
-# any object that `capply` received as context.
+# any object that `apply` received as context.
 #
 # Where a context object is not given, the same context rules above apply.
 #
 # Additionally, the function accepts a list as its first argument, which will
-# be passed as positional arguments for the function to be called. If you don't
-# want to set the context of the function, however, you can read up to the
-# `apply` function.
+# be passed as positional arguments for the function to be called.
 ###############################################################################
-(defun capply: (args, ctx, fn) ->
+(defun apply: (fn, args, ctx) ->
     (fn.apply ctx, args))
-
-
-#### Function `apply` #########################################################
-#
-#     fun apply list:args, fun:fn → result of calling fn
-#
-#
-# Apply is used to apply a list of arguments to a function, rather than an
-# execution context. It's basically an alias to `capply`, but using a null
-# context.
-###############################################################################
-(defun apply: (args, fn) ->
-    (capply args, null, fn))
 
 
 #### Function `call` ##########################################################
