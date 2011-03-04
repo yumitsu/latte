@@ -20,18 +20,3 @@ task 'test', 'Runs the test cases.', ->
     exec 'cd tests && coffee suite.coffee', (err, stdout) ->
         throw err if err
         console.log stdout
-
-
-task 'up:pages', 'Updates the GitHub pages for the project', ->
-    # This is just because I don't push directly from mercurial to git (since
-    # it has to pull from the remote repo, import, then push back), instead
-    # I keep my git repositories locally... so I don't think anyone using `git`
-    # will need this.
-    exec([
-        'cp index.html ignore/pages'
-        'cp -R docs    ignore/pages'
-        'cd ignore/pages'           # ignore/pages is a repo on gh-pages branch
-        'git push origin gh-pages'
-    ].join(' && '), (err) ->
-        throw err if err
-    )
