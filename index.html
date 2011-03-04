@@ -1,4 +1,4 @@
-<!DOCTYPE html>  <html> <head>   <title>latte.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="listp.html">                 listp.coffee               </a>                                           <a class="source" href="ops.html">                 ops.coffee               </a>                                           <a class="source" href="types.html">                 types.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               latte.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Latte is a small "lispey" dialect of coffee, written just to test how
+<!DOCTYPE html>  <html> <head>   <title>latte.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docs/docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="listp.html">                 listp.coffee               </a>                                           <a class="source" href="ops.html">                 ops.coffee               </a>                                           <a class="source" href="types.html">                 types.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               latte.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Latte is a small "lispey" dialect of coffee, written just to test how
 flexible the language's syntax is.</p>
 
 <p>Since the goal of the project is just to test how far this flexibility goes
@@ -20,9 +20,8 @@ loosing the closure in which the function was initially defined.</p>            
     <span class="nv">version: </span><span class="s1">&#39;0.1.0&#39;</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h1>Modules</h1>
 
 <p>As a modular library, Latte's functionality is separated by topics. At it's
-very core, the <a href="core.html">core</a> module provides everything that's needed to
-change the JavaScript/CoffeeScript workflow to something closer to
-Lisp.</p>
+very core, the <strong>core</strong> module provides everything that's needed to change
+the JavaScript/CoffeeScript workflow to something closer to Lisp.</p>
 
 <p>Basically the core includes functionality that's shared and relied on by all
 the other modules, like function and variable definition, let blocks and so
@@ -31,11 +30,11 @@ on.</p>
 <p>The following modules are included in Latte:</p>
 
 <ul>
-<li><a href="core.html">core</a>        — most basic functionality to abstract CoffeeScript.</li>
-<li><a href="ops.html">ops</a>         — defines general operators as functions.</li>
-<li><a href="collections.html">collections</a> — functions to iterate and manipulate collections.</li>
-<li><a href="listp.html">listp</a>       — functions to manipulate vectors and lists.</li>
-<li><a href="types.html">types</a>       — functions to handle type checking and coercion.</li>
+<li><a href="docs/core.html">core</a>        — most basic functionality to abstract CoffeeScript.</li>
+<li><a href="docs/ops.html">ops</a>         — defines general operators as functions.</li>
+<li><a href="docs/collections.html">collections</a> — functions to iterate and manipulate collections.</li>
+<li><a href="docs/listp.html">listp</a>       — functions to manipulate vectors and lists.</li>
+<li><a href="docs/types.html">types</a>       — functions to handle type checking and coercion.</li>
 </ul>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">require</span> <span class="s1">&#39;./core&#39;</span>
 <span class="nx">require</span> <span class="s1">&#39;./ops&#39;</span>
 <span class="nx">require</span> <span class="s1">&#39;./collections&#39;</span>
