@@ -6,8 +6,13 @@ task 'build', 'Continually build Latte with --watch', ->
         console.log data.toString().trim()
 
 task 'doc', 'Rebuild the Latte\'s documentation.', ->
-    exec 'vendor/docco/bin/docco src/*.coffee', (err) ->
-        throw err if err
+    exec([
+        'vendor/docco/bin/docco src/*.coffee'
+        'sed "s/docco.css/docs\\/docco.css/" < docs/latte.html > index.html'
+        'rm docs/latte.html'
+        ].join(' && '), (err) ->
+            throw err if err
+    )
 
 task 'test', 'Runs the test cases.', ->
     exec 'cd tests && coffee suite.coffee', (err, stdout) ->
