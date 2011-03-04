@@ -125,42 +125,68 @@
 
 ## Comparison #################################################################
 #
+# As a weak typed language, most of the comparison functions in JavaScript
+# involves some  kind of implicit type coercion. And this is not really a
+# problem, as the rules are pretty well defined.
 #
-###############################################################################
-# Compares a list using the given function.                                   #
-#                                                                             #
-# This is a general comparison function, that takes a sequence as the first   #
-# argument and a function as the second.                                      #
-#                                                                             #
-# The sequence is iterated using `all`. For each pair of items in the         #
-# sequence the callback function is called and expected to return whether the #
-# comparison for the given pair succeeds or fails.                            #
-#                                                                             #
-# If said callback returns any falsy value, the iteration is stopped and the  #
-# comparison fails — false is returned. Otherwise, if the iteration completes #
-# successfully, the comparison succeeds — true is returned.                   #
-#                                                                             #
-# Example::                                                                   #
-#                                                                             #
-#     >>> (cmp (list 1, 2, 3, 4), ((left, right) -> left < right))            #
-#     true                                                                    #
-#                                                                             #
-# Is the equivalent of::                                                      #
-#                                                                             #
-#     >>> 1 < 2 < 3 < 4                                                       #
-#     true                                                                    #
-#                                                                             #
-# Or in plain JavaScript, which reproduces better (and more explicitly) what  #
-# actually happens::                                                          #
-#                                                                             #
-#     >>> (1 < 2) && (2 < 3) && (3 < 4)                                       #
-#     true                                                                    #
-#                                                                             #
-# :param Array seq: The sequence to test.                                     #
-# :param Function fn: The function to test the pairs in the sequence          #
-#                                                                             #
-# :results: ``true`` or ``false``, depending on the success of the            #
-#           comparison.                                                       #
+# Comparison in Latte is done in pairs. All items of a given list are compared
+# to their successors, and succeed if all of the pairs passes the
+# comparison. If any of the pair's comparison fails, the entire comparison
+# fails and the function returns `false`.
+#
+# For example, to test if a list contain values that are equivalent to each
+# other, you'd use the following:
+#
+#     >>> (eq 1, "1", 1)
+#     true
+#
+# Which is mapped to something like the following JavaScript:
+#
+#     >>> (1 == "1") && ("1" == 1)
+#     true
+#
+# Note that the rules of type coercion apply for each pair in this case, so the
+# following would fail:
+#
+#     >>> (eq 1, "1", "001")
+#     false
+#
+# But this would pass:
+#
+#     >>> (eq "1", 1, "001")
+#     true
+#
+# To force your comparison to be done in a common type, just coerce the types
+# in the list:
+#
+#     >>> (apply eq (map (list 1, "1", "001"), int))
+#     true
+
+
+#### Function `cmp` ###########################################################
+#
+#     fun cmp list:seq, fun:fn → bool
+#
+#
+# The `cmp` function is the basis of the other comparison functions. It
+# compares each pair in the list using the given function.
+#
+# Since the sequence is iterated using `all`, if the comparison for any pair
+# fails the function promptly returns false and doesn't iterates the entire
+# sequence. If all of the pairs passes the comparison function, `true` is
+# returned.
+#
+# The callback function doesn't need to explicitly return a boolean. Any falsy
+# value indicates that the comparison failed, and truthy values indicates that
+# the comparison has succeeded.
+#
+# Example:
+#
+#     >>> (cmp (list 1, 2, 3, 4), ((left, right) -> left < right))
+#     true
+#
+#     >>> (cmp (list 2, 4, 8, 12), ((left, right) -> right % left))
+#     false  // 12 isn't divisible by 8
 ###############################################################################
 (defun cmp: (seq, fn) ->
     (letb (slen = (len seq)) ->
@@ -169,76 +195,84 @@
                                  , (-> fn prev, (car (nth idx + 1, seq))))))))
 
 
-###############################################################################
-# Compares if all items on the list are loosely equal `l == r`.               #
-#                                                                             #
-# On each pair, type coercion is performed as needed — that is, if the items  #
-# being tested are not of the same type, JavaScript will convert them to a    #
-# common format that it can use to compare both.                              #
-#                                                                             #
-# JavaScript's type coercion is regarded by many (myself included) as weird,  #
-# but the rules are well defined, of course. The following table tries to     #
-# summarise it, but you can always check ECMAScript's algorithm for abstract  #
-# equality.                                                                   #
-#                                                                             #
-# +---------------+----------------+-----------------------------------+      #
-# |     Type A    |     Type B     |              Result               |      #
-# +===============+================+===================================+      #
-# | null          | undefined      | true                              |      #
-# +---------------+----------------+-----------------------------------+      #
-# | undefined     | null           | true                              |      #
-# +---------------+----------------+-----------------------------------+      #
-# | Number        | String         | A == ToNumber(B)                  |      #
-# +---------------+----------------+-----------------------------------+      #
-# | String        | Number         | ToNumber(A) == B                  |      #
-# +---------------+----------------+-----------------------------------+      #
-# | Boolean       | Any            | ToNumber(A) == B                  |      #
-# +---------------+----------------+-----------------------------------+      #
-# | Any           | Boolean        | A == ToNumber(B)                  |      #
-# +---------------+----------------+-----------------------------------+      #
-# | String|Number | Object         | A == ToPrimitive(B)               |      #
-# +---------------+----------------+-----------------------------------+      #
-# | Object        | String|Number  | ToPrimitive(A) == B               |      #
-# +---------------+----------------+-----------------------------------+      #
-#                                                                             #
-# For more information on Type conversion algorithms, you should check the    #
-# `ECMASpecs`_.                                                               #
-#                                                                             #
-# .. _ECMAScpecs: http://bclary.com/2004/11/07/#a-9                           #
-#                                                                             #
-# For more information on how the comparison is performed, see :js:func:`cmp` #
-#                                                                             #
-# :param seq: Positional arguments with the items to compare.                 #
-#                                                                             #
-# :returns: ``true`` if all items are abstractly equal, ``false`` otherwise.  #
+## Equality ###################################################################
+#
+# Most of the JavaScript comparison operators are `abstract`. That is, they try
+# to convert your data to a common denominator and perform the comparison. This
+# can lead to some interesting (and frustrating) stuff, so it's better to know
+# the rules of type coercion that are used in JavaScript before diving into the
+# possibilities.
+#
+# As you should know (I really hope you're reading this with a JavaScript
+# background...), JavaScript has two equality operators: `==` and `===`; where
+# the former one performs type coercion as needed, and the latter returns true
+# only when both values have the same type and value.
+#
+# Unless the functions state otherwise, you should assume that none of them are
+# deep-recursive. That is, they don't check the members of an object or of an
+# array to compare them. In fact, object comparisons will only use the Object's
+# reference.
+
+
+#### Function `eq` ###########################################################
+#
+#     fun eq seq... → bool
+#
+#
+# The `eq` function uses ECMAScript's abstract equality algorithm, that is,
+# there are implicit type coercions involved. The following table summarises
+# what conversions are performed:
+#
+#
+#     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+#     ┃     Type A    ┃     Type B     ┃              Result               ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ null          ┃ undefined      ┃ true                              ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ undefined     ┃ null           ┃ true                              ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Number        ┃ String         ┃ A == ToNumber(B)                  ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ String        ┃ Number         ┃ ToNumber(A) == B                  ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Boolean       ┃ Any            ┃ ToNumber(A) == B                  ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Any           ┃ Boolean        ┃ A == ToNumber(B)                  ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ String|Number ┃ Object         ┃ A == ToPrimitive(B)               ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Object        ┃ String|Number  ┃ ToPrimitive(A) == B               ┃
+#     ┗━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+#
+# For more information on Type conversion algorithms, you should check the
+# [ECMASpecs][]
+#
+# [ECMAScpecs]: http://bclary.com/2004/11/07/#a-9
 ###############################################################################
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
 
 
-###############################################################################
-# Compares if all items on the list are strictly equal `l === r`              #
-#                                                                             #
-# The strict comparison function is rather easier than the abstract equality  #
-# function, since there's no type coercion involved. For each pair of items,  #
-# it returns ``true`` if all items are of the same type and equal to each     #
-# other, and ``false`` if they aren't.                                        #
-#                                                                             #
-# Note that this functions doesn't do deep comparisons for Objects. In this   #
-# case, one object will only be considered equal to another where they're     #
-# exactly the same — they refer to the same object.                           #
-#                                                                             #
-# For example, the following would actually yield ``false``::                 #
-#                                                                             #
-#     >>> (seq (list 1, 2, 3), (list 1, 2, 3))                                #
-#     false                                                                   #
-#                                                                             #
-# Since the lists points to distinct objects, despite having being            #
-# equivalent.                                                                 #
-#                                                                             #
-# :param seq: Positional arguments for each item to compare.                  #
-#                                                                             #
-# :returns: ``true`` if all items are equal, ``false`` otherwise.             #
+#### Function `eqs` ###########################################################
+#
+#     fun eqs... → bool
+#
+#
+# For strict comparisons, JavaScript provides the strictly equal operator
+# (`===`), which we alias here as the function `eqs`. The algorithm that
+# performs the comparison is far simpler than the abstract equality one: for
+# each pair of items, they're considered equal if they have the same type and
+# the same value.
+#
+# This doesn't hold true for object comparisons, though. In this case, they'll
+# only be considered equal to another object if both items of the pair refer to
+# the exactly same object.
+#
+# For example, the following would actually yield `false`, even though they're
+# of the same type and have the same value:
+#
+#     >>> (seq (list 1, 2, 3), (list 1, 2, 3))
+#     false
 ###############################################################################
 (defun eqs: (seq...) ->
     (cmp seq, ((l, r) -> l is r)))
