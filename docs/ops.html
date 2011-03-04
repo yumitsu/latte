@@ -1,0 +1,230 @@
+<!DOCTYPE html>  <html> <head>   <title>ops.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               ops.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>As an imperative language, JavaScript (and CoffeeScript) define operators to
+handle data. But these operators are nowhere as powerful as their Lisp
+counterpart, and they don't feel <code>functional</code> as well.</p>
+
+<p>To solve this minor nitpicking of mine, all general operators are rewritten
+as functions by this module. While certainly slower than the built-in
+symbols, they are more convenient and blend in better with the flow of the
+code.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h1>Conditionals</h1>
+
+<p>In order to map our truth testing constructs to functions in CoffeeScript we
+first have to solve the problem of controlling the flow of the program. So,
+where a construct would execute code <code>x</code> when a test passes, or test <code>y</code> when
+a test fails, the program must be able to manipulate this control flow.</p>
+
+<p>Given they would be simple expressions passed in the parameters, the only way
+this could work would be by wrapping each possible branch of the flow in a
+function, this way it wouldn't be evaluated right after the definition.</p>
+
+<p>The following functions all rely on this workaround to manipulate
+JavaScript's control flow, taking advantage of the sweet syntax for defining
+anonymous function in CoffeeScript.</p>
+
+<p>The most common case of branching is an <code>if-else</code> construct, that defines a
+piece of code to be executed when an arbitrary condition passes a truth test,
+or another piece of code otherwise.</p>
+
+<p>For these Latte provides a simple <code>YepNope</code> function, that will take a
+boolean expression, and two functions. The first function (<code>pass</code>) will be
+called when the expression is <strong>truthy</strong>, and the second (<code>fail</code>) when the
+expression is <strong>falsy</strong>.</p>
+
+<p>JavaScript has the following values as <strong>falsy</strong> ones:</p>
+
+<ul>
+<li>empty string (<code>""</code>)</li>
+<li>the number <code>0</code></li>
+<li>the boolean primitive <code>false</code></li>
+<li><code>null</code></li>
+<li><code>undefined</code></li>
+</ul>
+
+<p>Everything else is considered <strong>truthy</strong>, including empty lists (<code>[]</code>) and
+empty objects (<code>{}</code>)</p>
+
+<p>Note that <code>new Boolean(false)</code> is an Object, and therefore <strong>truthy</strong>. The
+same goes for <code>new Number(0)</code> and <code>new String("")</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Function <code>yn</code></h3>
+
+<pre><code>fun yn bool:test, fun:pass, fun:fail → pass() or fail() depending on test
+</code></pre>
+
+<p>The function is the basic <code>YepNope</code> construct in Latte. It'll call the
+function passed in the <code>pass</code> argument when <code>test</code> is truthy and <code>false</code>
+otherwise, returning the values of those calls:</p>
+
+<pre><code>&gt;&gt;&gt; (yn [], (-&gt; "yay"), (-&gt; "nay"))
+"yay"
+&gt;&gt;&gt; (yn "", (-&gt; "yay"), (-&gt; "nay"))
+"nay"
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">yn: </span><span class="p">(</span><span class="nx">test</span><span class="p">,</span> <span class="nx">pass</span><span class="p">,</span> <span class="nx">fail</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="k">if</span> <span class="nx">test</span> <span class="k">then</span> <span class="nx">pass</span><span class="o">?</span><span class="p">()</span> <span class="k">else</span> <span class="nx">fail</span><span class="o">?</span><span class="p">()))</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h3>Function <code>n</code></h3>
+
+<pre><code>fun n bool:test, fun:fn → fn() if test is falsy, undefined otherwise
+</code></pre>
+
+<p>If you only care about failing though, you don't need to go through the whole
+<code>YepNope</code> construct. In this case the <code>n</code> function works as an <code>unless</code>
+clause. That is, it calls the function only if the test fails:</p>
+
+<pre><code>&gt;&gt;&gt; (n 0 (-&gt; "foo"))
+"foo"
+&gt;&gt;&gt; (n 1 (-&gt; "foo"))
+undefined
+</code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">n: </span><span class="p">(</span><span class="nx">test</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">yn</span> <span class="nx">test</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h3>Function <code>cond</code></h3>
+
+<pre><code>fun cond tests... → the result of the first condition to pass
+</code></pre>
+
+<p>When you need to test for several different conditions, the <code>YepNope</code> pattern
+obviously gets out of hand. The Shceme's <code>cond</code> construct was also ported to
+Latte, using the same premises as the above functions.</p>
+
+<p>It accepts any number of <code>test conditions</code> — functions that return null or
+undefined if the condition fails, or anything else if it passes. All of the
+conditions are evaluated in order, and when one of the test passes it's
+return value is returned from the function and iteration stops.</p>
+
+<p>Since all of the positional arguments are just functions to be called, in
+order to decide if they should be used as the return value you'll often need
+to test another arbitrary condition. The <code>YepNope</code> pattern is pretty useful
+here:</p>
+
+<pre><code>&gt;&gt;&gt; (letb (x = "bar") -&gt;
+...   (cond (-&gt; (yn (eq x, "foo"), -&gt; "x is foo!"))
+...       , (-&gt; (yn (eq x, "bar"), -&gt; "x is bar!"))
+...       , (-&gt; (yn (eq y, x),     -&gt; "nowai!"))))
+...
+"x is bar!"
+</code></pre>
+
+<p>Note that since iteration stops after the first match (<code>x == bar</code>), there's
+no problem in having the next function compare <code>y</code> to <code>x</code>, even though <code>y</code> is
+not defined in the context — <code>cond</code> won't even bother calling the other
+functions.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">cond: </span><span class="p">(</span><span class="nx">tests</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">call</span> <span class="p">(</span><span class="nx">first</span> <span class="nx">tests</span><span class="p">,</span> <span class="p">((</span><span class="nx">test</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">test</span><span class="p">()</span><span class="o">?</span><span class="p">))))</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h1>Comparison</h1>
+
+<p>As a weak typed language, most of the comparison functions in JavaScript
+involves some  kind of implicit type coercion. Most of the time this is not
+really a problem, as the rules are pretty well defined, and you're unlikely
+to be caught by bad comparison chains. (</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Compares a list using the given function.                                   #
+                                                                            #
+This is a general comparison function, that takes a sequence as the first   #
+argument and a function as the second.                                      #
+                                                                            #
+The sequence is iterated using <code>all</code>. For each pair of items in the         #
+sequence the callback function is called and expected to return whether the #
+comparison for the given pair succeeds or fails.                            #
+                                                                            #
+If said callback returns any falsy value, the iteration is stopped and the  #
+comparison fails — false is returned. Otherwise, if the iteration completes #
+successfully, the comparison succeeds — true is returned.                   #
+                                                                            #
+Example::                                                                   #
+                                                                            #</p>
+
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <p>(cmp (list 1, 2, 3, 4), ((left, right) -> left &lt; right))            #
+          true                                                                    #
+                                                                                  #
+      Is the equivalent of::                                                      #
+                                                                                  #
+      1 &lt; 2 &lt; 3 &lt; 4                                                       #
+          true                                                                    #
+                                                                                  #
+      Or in plain JavaScript, which reproduces better (and more explicitly) what  #
+      actually happens::                                                          #
+                                                                                  #
+      (1 &lt; 2) &amp;&amp; (2 &lt; 3) &amp;&amp; (3 &lt; 4)                                       #
+          true                                                                    #
+                                                                                  #
+      :param Array seq: The sequence to test.                                     #
+      :param Function fn: The function to test the pairs in the sequence          #
+                                                                                  #
+      :results: <code>true</code> or <code>false</code>, depending on the success of the            #
+                comparison.                                                       #</p>
+    </blockquote>
+  </blockquote>
+</blockquote>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">cmp: </span><span class="p">(</span><span class="nx">seq</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">letb</span> <span class="p">(</span><span class="nx">slen</span> <span class="o">=</span> <span class="p">(</span><span class="nx">len</span> <span class="nx">seq</span><span class="p">))</span> <span class="o">-&gt;</span>
+        <span class="p">(</span><span class="nx">all</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">prev</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="o">-&gt;</span>
+            <span class="p">(</span><span class="nx">yn</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&gt;=</span> <span class="nx">slen</span><span class="p">),</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="kc">true</span><span class="p">)</span>
+                                 <span class="p">,</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="nx">fn</span> <span class="nx">prev</span><span class="p">,</span> <span class="p">(</span><span class="nx">car</span> <span class="p">(</span><span class="nx">nth</span> <span class="nx">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">seq</span><span class="p">))))))))</span></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Compares if all items on the list are loosely equal <code>l == r</code>.               #
+                                                                            #
+On each pair, type coercion is performed as needed — that is, if the items  #
+being tested are not of the same type, JavaScript will convert them to a    #
+common format that it can use to compare both.                              #
+                                                                            #
+JavaScript's type coercion is regarded by many (myself included) as weird,  #
+but the rules are well defined, of course. The following table tries to     #
+summarise it, but you can always check ECMAScript's algorithm for abstract  #
+equality.                                                                   #
+                                                                            #
++---------------+----------------+-----------------------------------+      #
+|     Type A    |     Type B     |              Result               |      #
++===============+================+===================================+      #
+| null          | undefined      | true                              |      #
++---------------+----------------+-----------------------------------+      #
+| undefined     | null           | true                              |      #
++---------------+----------------+-----------------------------------+      #
+| Number        | String         | A == ToNumber(B)                  |      #
++---------------+----------------+-----------------------------------+      #
+| String        | Number         | ToNumber(A) == B                  |      #
++---------------+----------------+-----------------------------------+      #
+| Boolean       | Any            | ToNumber(A) == B                  |      #
++---------------+----------------+-----------------------------------+      #
+| Any           | Boolean        | A == ToNumber(B)                  |      #
++---------------+----------------+-----------------------------------+      #
+| String|Number | Object         | A == ToPrimitive(B)               |      #
++---------------+----------------+-----------------------------------+      #
+| Object        | String|Number  | ToPrimitive(A) == B               |      #
++---------------+----------------+-----------------------------------+      #
+                                                                            #
+For more information on Type conversion algorithms, you should check the    #
+<code>ECMASpecs</code>_.                                                               #
+                                                                            #
+.. _ECMAScpecs: http://bclary.com/2004/11/07/#a-9                           #
+                                                                            #
+For more information on how the comparison is performed, see :js:func:<code>cmp</code> #
+                                                                            #
+:param seq: Positional arguments with the items to compare.                 #
+                                                                            #
+:returns: <code>true</code> if all items are abstractly equal, <code>false</code> otherwise.  #</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">eq: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">`</span><span class="nx">l</span> <span class="o">==</span> <span class="nx">r</span><span class="o">`</span><span class="p">)))</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Compares if all items on the list are strictly equal <code>l === r</code>              #
+                                                                            #
+The strict comparison function is rather easier than the abstract equality  #
+function, since there's no type coercion involved. For each pair of items,  #
+it returns <code>true</code> if all items are of the same type and equal to each     #
+other, and <code>false</code> if they aren't.                                        #
+                                                                            #
+Note that this functions doesn't do deep comparisons for Objects. In this   #
+case, one object will only be considered equal to another where they're     #
+exactly the same — they refer to the same object.                           #
+                                                                            #
+For example, the following would actually yield <code>false</code>::                 #
+                                                                            #</p>
+
+<blockquote>
+  <blockquote>
+    <blockquote>
+      <p>(seq (list 1, 2, 3), (list 1, 2, 3))                                #
+          false                                                                   #
+                                                                                  #
+      Since the lists points to distinct objects, despite having being            #
+      equivalent.                                                                 #
+                                                                                  #
+      :param seq: Positional arguments for each item to compare.                  #
+                                                                                  #
+      :returns: <code>true</code> if all items are equal, <code>false</code> otherwise.             #</p>
+    </blockquote>
+  </blockquote>
+</blockquote>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">eqs: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">l</span> <span class="o">is</span> <span class="nx">r</span><span class="p">)))</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Compares if all preceding items are greater than their successors</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">gt: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">l</span> <span class="o">&gt;</span> <span class="nx">r</span><span class="p">)))</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Compares if all prec items are greater or loosely equal to their successors</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">gte: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nx">l</span> <span class="o">&gt;=</span> <span class="nx">r</span><span class="p">))))</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Compares if all preceding items are lower than their sucessors</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">lt: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nx">l</span> <span class="o">&lt;</span> <span class="nx">r</span><span class="p">)))</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>Compares fi all prec items are lower or loosely equal to their successors</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">lte: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+    <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="nx">l</span> <span class="o">&lt;=</span> <span class="nx">r</span><span class="p">))))</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
