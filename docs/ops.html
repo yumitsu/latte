@@ -42,10 +42,13 @@ expression is <strong>falsy</strong>.</p>
 <p>Everything else is considered <strong>truthy</strong>, including empty lists (<code>[]</code>) and
 empty objects (<code>{}</code>)</p>
 
-<p>Note that <code>new Boolean(false)</code> is an Object, and therefore <strong>truthy</strong>. The
-same goes for <code>new Number(0)</code> and <code>new String("")</code>.</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Function <code>yn</code></h3>
+<blockquote>
+  <p>Note that <code>new Boolean(false)</code> is an Object, and therefore <strong>truthy</strong>. The
+  same goes for <code>new Number(0)</code> and <code>new String("")</code>.</p>
+</blockquote>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Function <code>yn</code></h3>
 
-<pre><code>fun yn bool:test, fun:pass, fun:fail → pass() or fail() depending on test
+<pre><code>fun yn bool:test, fun:pass, fun:fail
+       → pass() or fail() depending on test
 </code></pre>
 
 <p>The function is the basic <code>YepNope</code> construct in Latte. It'll call the
@@ -59,7 +62,8 @@ otherwise, returning the values of those calls:</p>
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">yn: </span><span class="p">(</span><span class="nx">test</span><span class="p">,</span> <span class="nx">pass</span><span class="p">,</span> <span class="nx">fail</span><span class="p">)</span> <span class="o">-&gt;</span>
     <span class="p">(</span><span class="k">if</span> <span class="nx">test</span> <span class="k">then</span> <span class="nx">pass</span><span class="o">?</span><span class="p">()</span> <span class="k">else</span> <span class="nx">fail</span><span class="o">?</span><span class="p">()))</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h3>Function <code>n</code></h3>
 
-<pre><code>fun n bool:test, fun:fn → fn() if test is falsy, undefined otherwise
+<pre><code>fun n bool:test, fun:fn
+      → fn() if test is falsy, undefined otherwise
 </code></pre>
 
 <p>If you only care about failing though, you don't need to go through the whole
@@ -73,7 +77,8 @@ undefined
 </code></pre>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">n: </span><span class="p">(</span><span class="nx">test</span><span class="p">,</span> <span class="nx">fn</span><span class="p">)</span> <span class="o">-&gt;</span>
     <span class="p">(</span><span class="nx">yn</span> <span class="nx">test</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="nx">fn</span><span class="p">))</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h3>Function <code>cond</code></h3>
 
-<pre><code>fun cond tests... → the result of the first condition to pass
+<pre><code>fun cond tests...
+    → the result of the first condition to pass
 </code></pre>
 
 <p>When you need to test for several different conditions, the <code>YepNope</code> pattern
@@ -197,29 +202,29 @@ reference.</p>             </td>             <td class="code">               <di
 there are implicit type coercions involved. The following table summarises
 what conversions are performed:</p>
 
-<pre><code>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃     Type A    ┃     Type B     ┃              Result               ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ null          ┃ undefined      ┃ true                              ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ undefined     ┃ null           ┃ true                              ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ Number        ┃ String         ┃ A == ToNumber(B)                  ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ String        ┃ Number         ┃ ToNumber(A) == B                  ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ Boolean       ┃ Any            ┃ ToNumber(A) == B                  ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ Any           ┃ Boolean        ┃ A == ToNumber(B)                  ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ String|Number ┃ Object         ┃ A == ToPrimitive(B)               ┃
-┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-┃ Object        ┃ String|Number  ┃ ToPrimitive(A) == B               ┃
-┗━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+<pre><code>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃     Type A    ┃     Type B     ┃       Result        ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ null          ┃ undefined      ┃ true                ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ undefined     ┃ null           ┃ true                ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ Number        ┃ String         ┃ A == ToNumber(B)    ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ String        ┃ Number         ┃ ToNumber(A) == B    ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ Boolean       ┃ Any            ┃ ToNumber(A) == B    ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ Any           ┃ Boolean        ┃ A == ToNumber(B)    ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ String|Number ┃ Object         ┃ A == ToPrimitive(B) ┃
+┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+┃ Object        ┃ String|Number  ┃ ToPrimitive(A) == B ┃
+┗━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━┛
 </code></pre>
 
 <p>For more information on Type conversion algorithms, you should check the
-[ECMASpecs][]</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">eq: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
+<a href="http://bclary.com/2004/11/07/#a-9">ECMASpecs</a></p>             </td>             <td class="code">               <div class="highlight"><pre><span class="p">(</span><span class="nx">defun</span> <span class="nv">eq: </span><span class="p">(</span><span class="nx">seq</span><span class="p">...)</span> <span class="o">-&gt;</span>
     <span class="p">(</span><span class="nx">cmp</span> <span class="nx">seq</span><span class="p">,</span> <span class="p">((</span><span class="nx">l</span><span class="p">,</span> <span class="nx">r</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="o">`</span><span class="nx">l</span> <span class="o">==</span> <span class="nx">r</span><span class="o">`</span><span class="p">)))</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h3>Function <code>eqs</code></h3>
 
 <pre><code>fun eqs... → bool
