@@ -45,13 +45,14 @@
 # Everything else is considered **truthy**, including empty lists (`[]`) and
 # empty objects (`{}`)
 #
-# Note that `new Boolean(false)` is an Object, and therefore **truthy**. The
-# same goes for `new Number(0)` and `new String("")`.
+# > Note that `new Boolean(false)` is an Object, and therefore **truthy**. The
+# > same goes for `new Number(0)` and `new String("")`.
 
 
 #### Function `yn` ############################################################
 #
-#     fun yn bool:test, fun:pass, fun:fail → pass() or fail() depending on test
+#     fun yn bool:test, fun:pass, fun:fail
+#            → pass() or fail() depending on test
 #
 #
 # The function is the basic `YepNope` construct in Latte. It'll call the
@@ -70,7 +71,8 @@
 
 #### Function `n` #############################################################
 #
-#     fun n bool:test, fun:fn → fn() if test is falsy, undefined otherwise
+#     fun n bool:test, fun:fn
+#           → fn() if test is falsy, undefined otherwise
 #
 #
 # If you only care about failing though, you don't need to go through the whole
@@ -89,7 +91,8 @@
 
 #### Function `cond` ##########################################################
 #
-#     fun cond tests... → the result of the first condition to pass
+#     fun cond tests...
+#         → the result of the first condition to pass
 #
 #
 # When you need to test for several different conditions, the `YepNope` pattern
@@ -224,30 +227,30 @@
 # what conversions are performed:
 #
 #
-#     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-#     ┃     Type A    ┃     Type B     ┃              Result               ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ null          ┃ undefined      ┃ true                              ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ undefined     ┃ null           ┃ true                              ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ Number        ┃ String         ┃ A == ToNumber(B)                  ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ String        ┃ Number         ┃ ToNumber(A) == B                  ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ Boolean       ┃ Any            ┃ ToNumber(A) == B                  ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ Any           ┃ Boolean        ┃ A == ToNumber(B)                  ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ String|Number ┃ Object         ┃ A == ToPrimitive(B)               ┃
-#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
-#     ┃ Object        ┃ String|Number  ┃ ToPrimitive(A) == B               ┃
-#     ┗━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+#     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+#     ┃     Type A    ┃     Type B     ┃       Result        ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ null          ┃ undefined      ┃ true                ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ undefined     ┃ null           ┃ true                ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Number        ┃ String         ┃ A == ToNumber(B)    ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ String        ┃ Number         ┃ ToNumber(A) == B    ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Boolean       ┃ Any            ┃ ToNumber(A) == B    ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Any           ┃ Boolean        ┃ A == ToNumber(B)    ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ String|Number ┃ Object         ┃ A == ToPrimitive(B) ┃
+#     ┣━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━━━━┫
+#     ┃ Object        ┃ String|Number  ┃ ToPrimitive(A) == B ┃
+#     ┗━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━━━━┛
 #
 # For more information on Type conversion algorithms, you should check the
 # [ECMASpecs][]
 #
-# [ECMAScpecs]: http://bclary.com/2004/11/07/#a-9
+# [ECMASpecs]: http://bclary.com/2004/11/07/#a-9
 ###############################################################################
 (defun eq: (seq...) ->
     (cmp seq, ((l, r) -> `l == r`)))
