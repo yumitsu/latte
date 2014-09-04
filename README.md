@@ -1,3 +1,5 @@
+![](http://img.shields.io/badge/status-abandoned%20by%20author-red.svg)
+
 Latte
 =====
 
